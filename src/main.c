@@ -47,8 +47,9 @@ handle_option(char *arg)
   } else if (!strncmp(arg,"--tournament:",13)) {
     bpType = TOURNAMENT;
     sscanf(arg+13,"%d:%d:%d", &ghistoryBits, &lhistoryBits, &pcIndexBits);
-  } else if (!strcmp(arg,"--custom")) {
+  } else if (!strncmp(arg,"--custom:",9)) {
     bpType = CUSTOM;
+    sscanf(arg+9,"%d:%d:%d", &ghistoryBits, &lhistoryBits, &pcIndexBits);
   } else if (!strcmp(arg,"--verbose")) {
     verbose = 1;
   } else {
@@ -85,6 +86,8 @@ main(int argc, char *argv[])
   bpType = STATIC;
   verbose = 0;
 
+  printf("start");
+
   // Process cmdline Arguments
   for (int i = 1; i < argc; ++i) {
     if (!strcmp(argv[i],"--help")) {
@@ -102,6 +105,7 @@ main(int argc, char *argv[])
     }
   }
 
+  printf("end args");
   // Initialize the predictor
   init_predictor();
 
@@ -110,6 +114,7 @@ main(int argc, char *argv[])
   uint32_t pc = 0;
   uint8_t outcome = NOTTAKEN;
 
+  printf("end init");
   // Reach each branch from the trace
   while (read_branch(&pc, &outcome)) {
     num_branches++;
@@ -136,6 +141,7 @@ main(int argc, char *argv[])
   // Cleanup
   fclose(stream);
   free(buf);
+  freeall();
 
   return 0;
 }
