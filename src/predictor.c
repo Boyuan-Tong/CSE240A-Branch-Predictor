@@ -148,9 +148,7 @@ init_predictor()
 //
 
 uint8_t gshare_predict(uint32_t pc) {
-  uint32_t pcbits = pc & gmask;
-  uint32_t hisbits = gshare_predictor.ghistory & gmask;
-  uint32_t idx = pcbits ^ hisbits;
+  uint32_t idx = (pc ^ gshare_predictor.ghistory) & gmask;
   return gshare_predictor.pht[idx] >= WT;
 }
 
@@ -169,8 +167,7 @@ uint8_t tournament_predict(uint32_t pc) {
 }
 
 uint8_t custom_predict(uint32_t pc) {
-  uint32_t ghisbits = custom_predictor.ghistory & gmask;
-  uint32_t idx = (pc & gmask) ^ ghisbits;
+  uint32_t idx = (pc ^ custom_predictor.ghistory) &gmask;
   uint32_t lhisbits, pcbits;
   if (custom_predictor.choice_pht[idx] <= WN) {
     // global predictor
@@ -214,9 +211,7 @@ make_prediction(uint32_t pc)
 //
 
 void gshare_train(uint32_t pc, uint8_t outcome) {
-  uint32_t pcbits = pc & gmask;
-  uint32_t hisbits = gshare_predictor.ghistory & gmask;
-  uint32_t idx = pcbits ^ hisbits;
+  uint32_t idx = (pc ^ gshare_predictor.ghistory) & gmask;
   if (outcome == TAKEN && gshare_predictor.pht[idx] < ST)
     gshare_predictor.pht[idx] ++;
   if (outcome == NOTTAKEN && gshare_predictor.pht[idx] > SN)
@@ -261,8 +256,7 @@ void tournament_train(uint32_t pc, uint8_t outcome) {
 }
 
 void custom_train(uint32_t pc, uint8_t outcome) {
-  uint32_t ghisbits = custom_predictor.ghistory & gmask;
-  uint32_t idx = (pc & gmask) ^ ghisbits;
+  uint32_t idx = (pc ^ custom_predictor.ghistory) & gmask;
   uint32_t pcbits = pc & pcmask;
   uint32_t lhisbits = custom_predictor.local_bht[pcbits] & lmask;
   uint8_t gresult = custom_predictor.global_pht[idx] >= WT;
